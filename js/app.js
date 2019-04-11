@@ -18,7 +18,11 @@ function initMap() {
 
 function handleSave() {
     var map = document.getElementById('map').map;
-    var coordinates = readCoordinates();
+    try {
+        var coordinates = readCoordinates();
+    } catch (err) {
+            alert('Нам не удалось прочитать сообщение')
+        }
 
     if (window.myCoordinates) {
         var bounds = new google.maps.LatLngBounds();
