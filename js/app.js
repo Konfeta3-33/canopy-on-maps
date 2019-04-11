@@ -32,7 +32,6 @@ function handleSave() {
         map.fitBounds(bounds);
     } else {
         map.setCenter(coordinates);
-        alert('Введите корректные данные');
     }
 
     new google.maps.Marker({
