@@ -21,7 +21,7 @@ function handleSave() {
     try {
         var coordinates = readCoordinates();
     } catch (err) {
-            alert('Нам не удалось прочитать сообщение')
+            alert('Нам не удалось прочитать сообщение');
         }
 
     if (window.myCoordinates) {
@@ -102,6 +102,7 @@ function showPosition(position) {
 //      230394       Date - 23rd of March 1994
 //      003.1,W      Magnetic Variation
 //      *6A          The checksum data, always begins with *
+
 function parseCoordinates(str) {
     var nmea = str.split(',');
 
