@@ -19,33 +19,39 @@ function initMap() {
 function handleSave() {
     var map = document.getElementById('map').map;
     try {
-        var coordinates = readCoordinates();
+        var data = readData();
+        document.getElementById('day').textContent = data.date;
+        console.log(data.date);
     } catch (err) {
-            alert('Нам не удалось прочитать сообщение');
-        }
+        alert('Нам не удалось прочитать сообщение');
+    }
 
     if (window.myCoordinates) {
         var bounds = new google.maps.LatLngBounds();
 
         bounds.extend(window.myCoordinates);
-        bounds.extend(coordinates);
+        bounds.extend(data.coordinates);
         map.fitBounds(bounds);
     } else {
-        map.setCenter(coordinates);
+        map.setCenter(data.coordinates);
     }
 
     new google.maps.Marker({
-        position: coordinates,
+        position: data.coordinates,
         map: map
     });
 
     document.querySelector('.gps-input').classList.add('hide');
     document.querySelector('.gps-result').classList.remove('hide');
+    document.querySelector('.battery').classList.remove('hide');
+    document.querySelector('.date').classList.remove('hide');
 }
 
 function handleEdit() {
     document.querySelector('.gps-result').classList.add('hide');
     document.querySelector('.gps-input').classList.remove('hide');
+    document.querySelector('.battery').classList.add('hide');
+    document.querySelector('.date').classList.add('hide');
 }
 
 function handleCopy() {
@@ -58,10 +64,13 @@ function handleCopy() {
     document.execCommand('copy');
 }
 
-function readCoordinates() {
+function readData() {
     var input = document.getElementById('input').value;
 
-    return parseCoordinates(input);
+    return {
+        date: parseDate(input),
+        coordinates: parseCoordinates(input)
+    };
 }
 
 function addMyPosition(){
@@ -72,7 +81,7 @@ function addMyPosition(){
 
 function showPosition(position) {
     var latitude = position.coords.latitude,
-        longitude = position.coords.longitude;
+    longitude = position.coords.longitude;
     var map = document.getElementById('map').map;
 
     window.myCoordinates = { lat: latitude, lng: longitude };
@@ -90,6 +99,7 @@ function showPosition(position) {
 // RMC - NMEA has its own version of essential gps pvt (position, velocity, time) data. It is called RMC, The Recommended Minimum, which will look similar to:
 //
 // $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
+// $GPRMC,080408.000,A,5447.2126,N,03738.6508,E,7.78,13.21,310319,,,A* 00,00; GSM: 250-01 026c-ffce,ffcd,1ced,ffff, 42;  S; Batt: 361,M
 //
 // Where:
 //      RMC          Recommended Minimum sentence C
@@ -120,4 +130,22 @@ function parseCoordinates(str) {
     }
 
     return { lat: parseLatitude(), lng: parseLongitude() };
+}
+
+function parseDate(str) {
+    var nmea = str.split(',');
+
+    var timePart = nmea[1];
+    var hour = timePart.substring(0, 2);
+    var minut = timePart.substring(2, 4);
+    var sec = timePart.substring(4,6);
+    var time = hour + ':' + minut + ':' + sec;
+
+    var datePart = nmea[9];
+    var year = datePart.substring(4, 6);
+    var month = datePart.substring(2, 4);
+    var day = datePart.substring(0, 2);
+    var date = '20' + year + '-' + month + '-' + day;
+
+    return date + ' ' + time;
 }
