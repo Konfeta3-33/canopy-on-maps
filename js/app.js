@@ -21,7 +21,8 @@ function handleSave() {
     try {
         var data = readData();
         document.getElementById('day').textContent = data.date;
-        console.log(data.date);
+        document.getElementById('percent').textContent = data.percent;
+        console.log(data.percent);
     } catch (err) {
         alert('Нам не удалось прочитать сообщение');
     }
@@ -43,15 +44,21 @@ function handleSave() {
 
     document.querySelector('.gps-input').classList.add('hide');
     document.querySelector('.gps-result').classList.remove('hide');
-    document.querySelector('.battery').classList.remove('hide');
-    document.querySelector('.date').classList.remove('hide');
+    // document.querySelector('.battery').classList.remove('hide');
+    document.querySelector('#day').classList.remove('hide');
+    document.querySelector('#percent').classList.remove('hide');
+    document.querySelector('i#threeDot').classList.add('hide');
+    document.querySelector('i#threeDotBat').classList.add('hide');
 }
 
 function handleEdit() {
     document.querySelector('.gps-result').classList.add('hide');
     document.querySelector('.gps-input').classList.remove('hide');
-    document.querySelector('.battery').classList.add('hide');
-    document.querySelector('.date').classList.add('hide');
+    // document.querySelector('.battery').classList.add('hide');
+    document.querySelector('#day').classList.add('hide');
+    document.querySelector('#percent').classList.add('hide');
+    document.querySelector('i#threeDot').classList.remove('hide');
+    document.querySelector('i#threeDotBat').classList.remove('hide');
 }
 
 function handleCopy() {
@@ -69,7 +76,8 @@ function readData() {
 
     return {
         date: parseDate(input),
-        coordinates: parseCoordinates(input)
+        coordinates: parseCoordinates(input),
+        percent: parseBattery(input)
     };
 }
 
@@ -148,4 +156,27 @@ function parseDate(str) {
     var date = '20' + year + '-' + month + '-' + day;
 
     return date + ' ' + time;
+}
+
+function parseBattery(str) {
+    var nmea = str.split(';');
+
+    var batteryPart = nmea[3];
+    var power = parseInt(batteryPart.substring(7, 10));
+    var percent = '';
+
+    if (power > 375) {
+        percent = '100%';
+    } else if (power < 340) {
+        percent = '< 10%';
+    } else {
+        percent = 90 * ((power - 340)/(375 - 340)) + '%';
+    }
+
+    // if (power >= 340 && power <= 375) {
+    //     percent = 
+    // }
+
+    console.log(percent);
+    return percent;
 }
